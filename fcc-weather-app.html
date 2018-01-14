@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>fcc-weather-simple</title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    body {
+      background-color: rgb(203, 207, 207);
+      margin: 10%;
+    }
+  </style>
+</head>
+
+<body>
+  <di  <div class="container text-center">
+    <div class="card bg-light mb-3">
+      <div class="h4 card-header">Your Local Weather</div>
+      <div class="card-body">
+        <div id="waiting">
+          <i class="fa fa-spinner fa-pulse fa-fw"></i>
+          Getting data...
+        </div>
+        <div id="data" class="collapse">
+          <div id="CityCountry" class="font-weight-bold">
+            <span id="city"></span>,
+            <span id="country"></span>
+          </div>
+          <br>
+          <span id="temp"></span>
+          <span id="unit"></span>
+          <br>
+          <img id="icon" src="">
+          <br>
+          <span id="main"></span> -
+          <span id="description"></span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div id="cf" class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label id="C" class="btn btn-info btn-sm active">
+            <input type="radio" name="options" checked value="c">&deg;C
+          </label>
+          <label id="F" class="btn btn-info btn-sm">
+            <input type="radio" name="options" value="f">&deg;F
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+    crossorigin="anonymous"></script>
+
+  <script>
+    
+    function toTitleCase(str) {
+      return str.replace(/(?:^|\s)\w/g, function (match) {
+        return match.toUpperCase();
+      });
+    }
+    $(function () {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          $.getJSON("https://fcc-weather-api.glitch.me/api/current?lat=" +
+            position.coords.latitude + "&lon=" + position.coords.longitude, function (json) {
+              $("#waiting").addClass('collapse');
+              $("#data").removeClass('collapse');
+              $("#city").html(json["name"]);
+              $("#country").html(json["sys"]["country"]);
+            value = Math.round(json["main"]["temp"]);
+            $("#temp").html(value);
+              $("#unit").html("&deg;C");
+              $("#icon").attr("src", json["weather"][0]["icon"]);
+              $("#main").html(json["weather"][0]["main"]);
+              $("#description").html(toTitleCase(json["weather"][0]["description"]));
+            });
+        }, function (error) {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              $("#data").html("User denied the request for Geolocation.");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              $("#data").html("Location information is unavailable.");
+              break;
+            case error.TIMEOUT:
+              $("#data").html("The request to get user location timed out.");
+              break;
+            case error.UNKNOWN_ERROR:
+              $("#data").html("An unknown error occurred.");
+              break;
+          }
+        });
+      } else {
+        $("#data").html("Geolocation is not supported by this browser.");
+      }
+
+        $('input[type=radio][name=options]').change(function() {
+        if (this.value == 'c') {
+          newTemp = Math.round((value - 32) * 5 / 9);
+          newUnit = "C";
+        }
+        else if (this.value == 'f') {
+          newTemp = Math.round(value * 9 / 5 + 32);
+          newUnit = "F";
+        }
+        $("#temp").html(newTemp);
+        $("#unit").html("&deg;" + newUnit);
+          value = newTemp;
+    });
+    });
+  </script>
+</body>
+
+</html>
